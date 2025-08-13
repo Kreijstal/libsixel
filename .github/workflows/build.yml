@@ -44,11 +44,12 @@ jobs:
       with:
         msystem: ${{ matrix.sys }}
         update: true
+        install: >-
+          autoconf
+          automake
+          libtool
+          make
         pacboy: >-
-          autoconf:p
-          automake:p
-          libtool:p
-          make:p
           libpng:p
           libjpeg-turbo:p
           libgd:p
