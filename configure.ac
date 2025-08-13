@@ -366,99 +366,17 @@ AC_SUBST(GDK_PIXBUF_LIBS)
 
 
 if test x$with_gd != xno; then
-    CFLAGS_BACKUP=$CFLAGS
-    LDFLAGS_BACKUP=$LDFLAGS
-    if test x$with_gd != xyes -a x$with_gd != xauto; then
-        if test ! -d "$with_gd"; then
-            AC_MSG_ERROR(["${with_gd}" is not directory])
-        fi
-        ADDED_CFLAGS="-I${with_gd}/include"
-        ADDED_LIBS="-L${with_gd}/lib -lgd"
-    else
-        if test x${prefix} != x -a x${prefix} != xNONE; then
-            ADDED_CFLAGS="-I${prefix}/include"
-            ADDED_LIBS="-L${prefix}/lib -lgd"
-        else
-            ADDED_CFLAGS="-I/usr/local/include"
-            ADDED_LIBS="-L/usr/local/lib -lgd"
-        fi
-    fi
-    CFLAGS="${CFLAGS} ${GD_CFLAGS}"
-    LDFLAGS="${LDFLAGS} ${GD_LIBS}"
-    AC_CHECK_HEADER([gd.h],
-                    [AC_CHECK_LIB([gd],
-                                  [gdImageCreateFromGifPtr],
-                                  [have_gd="yes"
-                                   GD_CFLAGS=$ADDED_CFLAGS
-                                   GD_LIBS=$ADDED_LIBS],
-                                  [have_gd="no"])])
-    CFLAGS=$CFLAGS_BACKUP
-    LDFLAGS=$LDFLAGS_BACKUP
-    if test x${PKG_CONFIG} != x; then
-        if test x$have_gd != xyes -a ! -d "$with_gd"; then
-            PKG_CHECK_MODULES(GD, [gdlib], [have_gd=yes], [have_gd=no])
-        fi
-    fi
+    PKG_CHECK_MODULES([GD], [gdlib], [have_gd=yes], [have_gd=no])
     if test x$have_gd = xyes; then
-        CFLAGS_BACKUP=$CFLAGS
-        LDFLAGS_BACKUP=$LDFLAGS
-        CFLAGS="$CFLAGS $GD_CFLAGS"
-        LDFLAGS="${LDFLAGS} ${GD_LIBS}"
-        AC_CHECK_LIB([gd],
-                     [gdImageCreateFromGifPtr],
-                     [AC_CHECK_DECLS([gdImageCreateFromGifPtr],   [], [], [ #include <gd.h> ])])
-        AC_CHECK_LIB([gd],
-                     [gdImageCreateFromPngPtr],
-                     [AC_CHECK_DECLS([gdImageCreateFromPngPtr],   [], [], [ #include <gd.h> ])])
-        AC_CHECK_LIB([gd],
-                     [gdImageCreateFromBmpPtr],
-                     [AC_CHECK_DECLS([gdImageCreateFromBmpPtr],   [], [], [ #include <gd.h> ])])
-        AC_CHECK_LIB([gd],
-                     [gdImageCreateFromJpegPtrEx],
-                     [AC_CHECK_DECLS([gdImageCreateFromJpegPtrEx],[], [], [ #include <gd.h> ])])
-        AC_CHECK_LIB([gd],
-                     [gdImageCreateFromJpegPtr],
-                     [AC_CHECK_DECLS([gdImageCreateFromJpegPtr],  [], [], [ #include <gd.h> ])])
-        AC_CHECK_LIB([gd],
-                     [gdImageCreateFromTgaPtr],
-                     [AC_CHECK_DECLS([gdImageCreateFromTgaPtr],   [], [], [ #include <gd.h> ])])
-        AC_CHECK_LIB([gd],
-                     [gdImageCreateFromWBMPPtr],
-                     [AC_CHECK_DECLS([gdImageCreateFromWBMPPtr],  [], [], [ #include <gd.h> ])])
-        AC_CHECK_LIB([gd],
-                     [gdImageCreateFromTiffPtr],
-                     [AC_CHECK_DECLS([gdImageCreateFromTiffPtr], [], [], [ #include <gd.h> ])])
-        AC_CHECK_LIB([gd],
-                     [gdImageCreateFromGd2Ptr],
-                     [AC_CHECK_DECLS([gdImageCreateFromGd2Ptr],   [], [], [ #include <gd.h> ])])
-        AC_CHECK_LIB([gd],
-                     [gdImagePaletteToTrueColor],
-                     [AC_CHECK_DECLS([gdImagePaletteToTrueColor], [], [], [ #include <gd.h> ])])
-        CFLAGS=$CFLAGS_BACKUP
-        LDFLAGS=$LDFLAGS_BACKUP
         AC_DEFINE(HAVE_GD, 1, [whether gd is available])
         loaders="${loaders} gd"
+        AC_MSG_NOTICE([gd cflags is ${GD_CFLAGS}])
+        AC_MSG_NOTICE([gd libs is ${GD_LIBS}])
     else
-        GD_CFLAGS=
-        GD_LIBS=
-        AC_MSG_ERROR(gd is not available.)
+        if test x$with_gd = xyes; then
+            AC_MSG_ERROR(gd is not available.)
+        fi
     fi
-
-    case $host in
-        *-*-cygwin)
-            AC_CHECK_LIB(iconv, [libiconv], [],
-                         [AC_CHECK_LIB(iconv, [iconv], [],
-                                       [AC_MSG_ERROR([please install libiconv])])
-                         ])
-            ;;
-        *-*-interix)
-            AM_CPPFLAGS="-D_ALL_SOURCES"
-            AC_SUBST([AM_CPPFLAGS])
-            ;;
-    esac
-
-    AC_MSG_NOTICE([gd cflags is ${GD_CFLAGS}])
-    AC_MSG_NOTICE([gd libs is ${GD_LIBS}])
 fi
 AC_SUBST(GD_CFLAGS)
 AC_SUBST(GD_LIBS)
@@ -616,7 +534,7 @@ if test x$with_png != xno; then
                        [], [], [ #include <png.h> ])
         CFLAGS=$CFLAGS_BACKUP
         LDFLAGS=$LDFLAGS_BACKUP
-        AC_DEFINE(HAVE_LIBPNG, 1, [whether libpng is available])
+        AC_DEFINE(HAVE_PNG, 1, [whether libpng is available])
         loaders="${loaders} png"
         AC_MSG_NOTICE([libpng cflags is ${LIBPNG_CFLAGS}])
         AC_MSG_NOTICE([libpng libs is ${LIBPNG_LIBS}])
@@ -664,7 +582,7 @@ AC_CONFIG_FILES([Makefile
                  converters/Makefile
                  tools/Makefile
                  tools/libsixel-config
-                 python/Makefile
+                 python3/Makefile
                 ])
 
 AC_OUTPUT
