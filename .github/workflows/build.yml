@@ -56,25 +56,55 @@ jobs:
           cc:p
           curl:p
 
-    - name: Configure and build
-      shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
+    - name: Configure and build (non-Windows)
+      if: runner.os != 'Windows'
+      shell: bash
       run: |
         ./autogen.sh
         ./configure --enable-tests --with-gdk-pixbuf2 --with-gd --with-libcurl --with-png --with-jpeg
         make
 
-    - name: Run tests
-      shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
+    - name: Configure and build (Windows)
+      if: runner.os == 'Windows'
+      shell: msys2 {0}
+      run: |
+        ./autogen.sh
+        ./configure --enable-tests --with-gdk-pixbuf2 --with-gd --with-libcurl --with-png --with-jpeg
+        make
+
+    - name: Run tests (non-Windows)
+      if: runner.os != 'Windows'
+      shell: bash
       run: make check
 
-    - name: Install artifacts
-      shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
+    - name: Run tests (Windows)
+      if: runner.os == 'Windows'
+      shell: msys2 {0}
+      run: make check
+
+    - name: Install artifacts (non-Windows)
+      if: runner.os != 'Windows'
+      shell: bash
       run: |
         mkdir -p install
         make install DESTDIR=$(pwd)/install
 
-    - name: Package artifacts
-      shell: ${{ runner.os == 'Windows' && 'msys2 {0}' || 'bash' }}
+    - name: Install artifacts (Windows)
+      if: runner.os == 'Windows'
+      shell: msys2 {0}
+      run: |
+        mkdir -p install
+        make install DESTDIR=$(pwd)/install
+
+    - name: Package artifacts (non-Windows)
+      if: runner.os != 'Windows'
+      shell: bash
+      run: |
+        tar -czvf libsixel-${{ runner.os }}-${{ matrix.sys || 'native' }}.tar.gz -C install .
+
+    - name: Package artifacts (Windows)
+      if: runner.os == 'Windows'
+      shell: msys2 {0}
       run: |
         tar -czvf libsixel-${{ runner.os }}-${{ matrix.sys || 'native' }}.tar.gz -C install .
 
