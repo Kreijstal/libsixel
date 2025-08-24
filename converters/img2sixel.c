@@ -65,7 +65,7 @@ void show_version(void)
            "no\n"
 #endif
            "  libpng: "
-#ifdef HAVE_PNG
+#ifdef HAVE_LIBPNG
            "yes\n"
 #else
            "no\n"

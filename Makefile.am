@@ -1,7 +1,7 @@
 #
 # @configure_input@
 #
-SUBDIRS = include src converters tools python3
+SUBDIRS = include src converters tools python
 DIST_SUBDIRS = $(SUBDIRS)
 
 EXTRA_DIST = LICENSE LICENSE.images LICENSE.mesa LICENSE.pngsuite \
